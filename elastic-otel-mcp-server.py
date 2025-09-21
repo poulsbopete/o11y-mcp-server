@@ -581,14 +581,22 @@ class ElasticOTELMCPServer:
 def main():
     """Main entry point"""
     import sys
+    import os
     
-    if len(sys.argv) != 3:
-        print("Usage: python elastic-otel-mcp-server.py <elastic-endpoint> <api-key>")
-        print("Example: python elastic-otel-mcp-server.py https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud ZktNNGJaa0JxTVdyT0R5UlpCR2w6bzNtZTV5eVRicVJlV21hRmN0TVBvZw==")
-        sys.exit(1)
+    # Try to get credentials from environment variables first
+    elastic_endpoint = os.getenv('ELASTIC_ENDPOINT')
+    api_key = os.getenv('ELASTIC_API_KEY')
     
-    elastic_endpoint = sys.argv[1]
-    api_key = sys.argv[2]
+    # If not in environment, try command line arguments
+    if not elastic_endpoint or not api_key:
+        if len(sys.argv) != 3:
+            print("Usage: python elastic-otel-mcp-server.py <elastic-endpoint> <api-key>")
+            print("Or set environment variables: ELASTIC_ENDPOINT and ELASTIC_API_KEY")
+            print("Example: python elastic-otel-mcp-server.py https://your-endpoint.kb.us-east-1.aws.elastic.cloud your-api-key")
+            sys.exit(1)
+        
+        elastic_endpoint = sys.argv[1]
+        api_key = sys.argv[2]
     
     server = ElasticOTELMCPServer(elastic_endpoint, api_key)
     

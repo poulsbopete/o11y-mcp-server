@@ -6,20 +6,38 @@ echo "===================================="
 # Activate virtual environment
 source venv/bin/activate
 
-# Check if arguments are provided
-if [ $# -eq 0 ]; then
-    echo "Usage: $0 <elastic-endpoint> <api-key>"
-    echo ""
-    echo "Example:"
-    echo "  $0 https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud ZktNNGJaa0JxTVdyT0R5UlpCR2w6bzNtZTV5eVRicVJlV21hRmN0TVBvZw=="
-    echo ""
-    echo "Or run with default demo credentials:"
-    echo "  $0 demo"
-    exit 1
+# Load environment variables from .env file if it exists
+if [ -f .env ]; then
+    echo "📄 Loading environment variables from .env file..."
+    export $(cat .env | grep -v '^#' | xargs)
 fi
 
-# Use demo credentials if "demo" is passed
-if [ "$1" = "demo" ]; then
+# Check if environment variables are set
+if [ -n "$ELASTIC_ENDPOINT" ] && [ -n "$ELASTIC_API_KEY" ]; then
+    echo "✅ Using environment variables"
+    ELASTIC_ENDPOINT="$ELASTIC_ENDPOINT"
+    API_KEY="$ELASTIC_API_KEY"
+elif [ $# -eq 0 ]; then
+    echo "❌ No credentials provided!"
+    echo ""
+    echo "Usage options:"
+    echo "1. Set environment variables:"
+    echo "   export ELASTIC_ENDPOINT=https://your-endpoint.kb.us-east-1.aws.elastic.cloud"
+    echo "   export ELASTIC_API_KEY=your-api-key"
+    echo "   $0"
+    echo ""
+    echo "2. Use .env file:"
+    echo "   Create .env file with ELASTIC_ENDPOINT and ELASTIC_API_KEY"
+    echo "   $0"
+    echo ""
+    echo "3. Pass credentials as arguments:"
+    echo "   $0 <elastic-endpoint> <api-key>"
+    echo ""
+    echo "4. Use demo credentials:"
+    echo "   $0 demo"
+    exit 1
+elif [ "$1" = "demo" ]; then
+    echo "🎯 Using demo credentials"
     ELASTIC_ENDPOINT="https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud"
     API_KEY="ZktNNGJaa0JxTVdyT0R5UlpCR2w6bzNtZTV5eVRicVJlV21hRmN0TVBvZw=="
 else

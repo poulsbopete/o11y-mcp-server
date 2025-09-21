@@ -41,12 +41,26 @@ A Model Context Protocol (MCP) server that provides real-time insights into appl
    pip install -r requirements.txt
    ```
 
-3. **Run the server**
+3. **Configure credentials**
    ```bash
-   # With demo credentials
-   ./run-mcp-server.sh demo
+   # Option 1: Use setup script (recommended)
+   ./setup-env.sh
+   # Then edit .env file with your credentials
    
-   # With your own credentials
+   # Option 2: Set environment variables
+   export ELASTIC_ENDPOINT=https://your-endpoint.kb.us-east-1.aws.elastic.cloud
+   export ELASTIC_API_KEY=your-api-key
+   
+   # Option 3: Use demo credentials
+   ./run-mcp-server.sh demo
+   ```
+
+4. **Run the server**
+   ```bash
+   # With environment variables or .env file
+   ./run-mcp-server.sh
+   
+   # With command line arguments
    ./run-mcp-server.sh <your-elastic-endpoint> <your-api-key>
    ```
 
