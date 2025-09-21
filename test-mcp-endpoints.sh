@@ -9,9 +9,17 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 fi
 
-# Configuration - use environment variables with fallbacks
-ELASTIC_HOST="${ELASTIC_ENDPOINT:-https://ai-assistants-ffcafb.kb.us-east-1.aws.elastic.cloud}"
-API_KEY="${ELASTIC_API_KEY:-aGdDR0RKa0JETUNGNlpRbkRHVDY6T0VyTFcyUVN4VWxyaEQyZ00yMnk3QQ==}"
+# Configuration - use environment variables only
+ELASTIC_HOST="$ELASTIC_ENDPOINT"
+API_KEY="$ELASTIC_API_KEY"
+
+# Check if required environment variables are set
+if [ -z "$ELASTIC_ENDPOINT" ] || [ -z "$ELASTIC_API_KEY" ]; then
+    echo "❌ Error: Required environment variables not set!"
+    echo "Please set ELASTIC_ENDPOINT and ELASTIC_API_KEY in your .env file"
+    echo "Or run: ./setup-env.sh"
+    exit 1
+fi
 
 echo "🔧 Configuration:"
 echo "  Host: $ELASTIC_HOST"

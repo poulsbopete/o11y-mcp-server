@@ -33,9 +33,13 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 fi
 
-# Get credentials
-ELASTIC_ENDPOINT="${ELASTIC_ENDPOINT:-https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud}"
-ELASTIC_API_KEY="${ELASTIC_API_KEY:-ZktNNGJaa0JxTVdyT0R5UlpCR2w6bzNtZTV5eVRicVJlV21hRmN0TVBvZw==}"
+# Get credentials from environment variables
+if [ -z "$ELASTIC_ENDPOINT" ] || [ -z "$ELASTIC_API_KEY" ]; then
+    echo "❌ Error: Required environment variables not set!"
+    echo "Please set ELASTIC_ENDPOINT and ELASTIC_API_KEY in your .env file"
+    echo "Or run: ./setup-env.sh"
+    exit 1
+fi
 
 echo "📊 Elastic Endpoint: $ELASTIC_ENDPOINT"
 echo "🔑 API Key: ${ELASTIC_API_KEY:0:20}..."
