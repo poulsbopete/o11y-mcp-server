@@ -3,9 +3,15 @@
 echo "🔗 MCP (Model Context Protocol) ENDPOINT TESTING"
 echo "================================================="
 
-# Configuration
-ELASTIC_HOST="https://ai-assistants-ffcafb.kb.us-east-1.aws.elastic.cloud"
-API_KEY="aGdDR0RKa0JETUNGNlpRbkRHVDY6T0VyTFcyUVN4VWxyaEQyZ00yMnk3QQ=="
+# Load environment variables from .env file if it exists
+if [ -f .env ]; then
+    echo "📄 Loading environment variables from .env file..."
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
+# Configuration - use environment variables with fallbacks
+ELASTIC_HOST="${ELASTIC_ENDPOINT:-https://ai-assistants-ffcafb.kb.us-east-1.aws.elastic.cloud}"
+API_KEY="${ELASTIC_API_KEY:-aGdDR0RKa0JETUNGNlpRbkRHVDY6T0VyTFcyUVN4VWxyaEQyZ00yMnk3QQ==}"
 
 echo "🔧 Configuration:"
 echo "  Host: $ELASTIC_HOST"
