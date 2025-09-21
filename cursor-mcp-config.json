@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "elastic-otel": {
+      "command": "/opt/o11y-mcp-server/venv/bin/python",
+      "args": [
+        "/opt/o11y-mcp-server/elastic-otel-mcp-server.py"
+      ],
+      "env": {
+        "ELASTIC_ENDPOINT": "https://your-elastic-endpoint.kb.us-east-1.aws.elastic.cloud",
+        "ELASTIC_API_KEY": "your-elastic-api-key-here"
+      }
+    }
+  }
+}
