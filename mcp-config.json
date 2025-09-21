@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "elastic-otel": {
+      "command": "python",
+      "args": ["/opt/o11y-mcp-server/elastic-otel-mcp-server.py", "https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud", "ZktNNGJaa0JxTVdyT0R5UlpCR2w6bzNtZTV5eVRicVJlV21hRmN0TVBvZw=="],
+      "env": {}
+    }
+  }
+}
