@@ -1,98 +1,72 @@
 # 🔗 Cursor MCP Integration Guide
 
-This guide shows you how to integrate Cursor with your Elastic OTEL MCP server for a complete MCP workflow.
+This guide shows you how to integrate Cursor with Elastic Agent Builder for AI-powered application health monitoring.
 
 ## 📋 Prerequisites
 
 - Cursor IDE installed
-- Your Elastic OTEL MCP server running
-- Elastic Serverless Observability endpoint
+- Elastic Serverless Observability endpoint with Agent Builder enabled
 - Valid API key for Elastic
+- No local server required - direct connection to Elastic
 
-## 🔧 Step 1: Configure Cursor for MCP
+## 🔧 Step 1: Configure Cursor for Agent Builder
 
-### 1.1 Create Cursor MCP Configuration
+### 1.1 Quick Setup
 
-Create or edit the Cursor MCP configuration file:
+Use the automated setup script:
 
-**On macOS:**
 ```bash
-mkdir -p ~/.cursor
+./setup-cursor-agent-builder.sh
 ```
 
-**On Windows:**
-```bash
-mkdir -p %APPDATA%\Cursor
-```
+This script will:
+- Create the Cursor MCP configuration directory
+- Generate `~/.cursor/mcp_config.json` with Agent Builder integration
+- Set up environment variables for Elastic connection
 
-**On Linux:**
-```bash
-mkdir -p ~/.config/cursor
-```
+### 1.2 Manual Setup
 
-### 1.2 Create MCP Configuration File
-
-Create `~/.cursor/mcp_config.json` (or equivalent for your OS):
+If you prefer manual configuration, create `~/.cursor/mcp_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "elastic-otel": {
-      "command": "python",
+    "elastic-agent-builder": {
+      "command": "curl",
       "args": [
-        "/opt/o11y-mcp-server/elastic-otel-mcp-server.py",
-        "https://your-elastic-endpoint",
-        "your-api-key"
+        "-X", "POST",
+        "-H", "Authorization: ApiKey ${ELASTIC_API_KEY}",
+        "-H", "kbn-xsrf: true",
+        "-H", "Content-Type: application/json",
+        "${ELASTIC_ENDPOINT}/api/agent_builder/tools"
       ],
       "env": {
-        "PYTHONPATH": "/opt/o11y-mcp-server/venv/lib/python3.13/site-packages"
+        "ELASTIC_ENDPOINT": "${ELASTIC_ENDPOINT}",
+        "ELASTIC_API_KEY": "${ELASTIC_API_KEY}"
       }
     }
   }
 }
 ```
 
-### 1.3 Alternative: Use Virtual Environment
+## 🚀 Step 2: Connect to Agent Builder
 
-For better isolation, use the virtual environment:
-
-```json
-{
-  "mcpServers": {
-    "elastic-otel": {
-      "command": "/opt/o11y-mcp-server/venv/bin/python",
-      "args": [
-        "/opt/o11y-mcp-server/elastic-otel-mcp-server.py",
-        "https://your-elastic-endpoint",
-        "your-api-key"
-      ],
-      "env": {}
-    }
-  }
-}
-```
-
-## 🚀 Step 2: Start Your MCP Server
-
-### 2.1 Start the Server
+### 2.1 Test Agent Builder Connection
 ```bash
 cd /opt/o11y-mcp-server
-./run-mcp-server.sh <your-elastic-endpoint> <your-api-key>
+./connect-to-agent-builder.sh
 ```
 
-### 2.2 Verify Server is Running
-The server should show:
+### 2.2 Verify Agent Builder is Accessible
+The connection should show:
 ```
-🚀 Starting Elastic OTEL MCP Server...
+🤖 Connecting to Elastic Agent Builder
 📊 Connecting to: https://your-elastic-endpoint
+✅ Agent Builder is accessible
 🎯 Available tools:
-  - get_application_health
-  - get_service_metrics
-  - get_error_analysis
-  - get_performance_issues
-  - get_resource_utilization
-  - get_trace_analysis
-  - get_code_recommendations
+  - platform.core.search
+  - platform.core.execute_esql
+  - platform.core.generate_esql
 ```
 
 ## 🔗 Step 3: Configure Cursor
@@ -102,44 +76,22 @@ The server should show:
 2. Go to Settings (Cmd/Ctrl + ,)
 3. Search for "MCP" or "Model Context Protocol"
 
-### 3.2 Add MCP Server Configuration
-In Cursor settings, add your MCP server configuration:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "elastic-otel": {
-        "command": "python",
-        "args": [
-          "/opt/o11y-mcp-server/elastic-otel-mcp-server.py",
-          "https://your-elastic-endpoint",
-          "your-api-key"
-        ],
-        "env": {
-          "PYTHONPATH": "/opt/o11y-mcp-server/venv/lib/python3.13/site-packages"
-        }
-      }
-    }
-  }
-}
-```
+### 3.2 Verify MCP Configuration
+The setup script should have created `~/.cursor/mcp_config.json` with Agent Builder integration.
 
 ### 3.3 Restart Cursor
-After adding the configuration, restart Cursor to load the MCP server.
+After configuration, restart Cursor to load the Agent Builder connection.
 
-## 🎯 Step 4: Use MCP Tools in Cursor
+## 🎯 Step 4: Use Agent Builder Tools in Cursor
 
 ### 4.1 Available Tools in Cursor
-Once configured, you can use these tools in Cursor:
+Once configured, you can use these Agent Builder tools in Cursor:
 
-- **`get_application_health`** - Get overall application health
-- **`get_service_metrics`** - Get service-specific metrics
-- **`get_error_analysis`** - Analyze errors and exceptions
-- **`get_performance_issues`** - Identify performance bottlenecks
-- **`get_resource_utilization`** - Monitor resource usage
-- **`get_trace_analysis`** - Analyze distributed traces
-- **`get_code_recommendations`** - Get optimization suggestions
+- **`platform.core.search`** - Search OTEL data in Elasticsearch
+- **`platform.core.execute_esql`** - Execute ESQL queries on OTEL data
+- **`platform.core.generate_esql`** - Generate ESQL queries for analysis
+- **Built-in Analysis** - Error patterns, performance metrics, resource utilization
+- **Real-time Monitoring** - Application health, service dependencies, bottlenecks
 
 ### 4.2 Example Queries in Cursor
 
@@ -152,39 +104,40 @@ You can now ask Cursor questions like:
 "Find the slowest operations in my system"
 "Analyze resource utilization across all services"
 "Show me trace analysis for the checkout flow"
-"What code optimizations do you recommend?"
+"Generate an ESQL query for error analysis"
 ```
 
-## 🔄 Step 5: Complete MCP Workflow
+## 🔄 Step 5: Complete Agent Builder Workflow
 
 ### 5.1 Development Workflow
 1. **Code Development**: Write code in Cursor
 2. **Deploy to Elastic**: Send OTEL data to Elastic Serverless
-3. **Monitor Health**: Use MCP tools to analyze application health
-4. **Optimize**: Get recommendations and implement improvements
+3. **Monitor Health**: Use Agent Builder tools to analyze application health
+4. **Optimize**: Get AI-powered recommendations and implement improvements
 5. **Repeat**: Continuous monitoring and optimization
 
 ### 5.2 Example Workflow
 ```
 1. Deploy application with OTEL instrumentation
 2. Ask Cursor: "What's the health of my applications?"
-3. Cursor uses MCP server to query Elastic data
-4. Get insights about errors, performance, resources
-5. Ask follow-up: "What optimizations do you recommend?"
+3. Cursor uses Agent Builder to query Elastic data
+4. Get AI-powered insights about errors, performance, resources
+5. Ask follow-up: "Generate an ESQL query for performance analysis"
 6. Implement suggested improvements
-7. Monitor results with: "Show me updated metrics"
+7. Monitor results with: "Show me updated metrics using ESQL"
 ```
 
 ## 🛠️ Troubleshooting
 
-### Server Won't Start
-- Check virtual environment: `source venv/bin/activate`
-- Verify dependencies: `pip list | grep -E "(httpx|mcp)"`
-- Test server manually: `python3 elastic-otel-mcp-server.py <endpoint> <key>`
+### Agent Builder Connection Issues
+- Test connection: `./connect-to-agent-builder.sh`
+- Verify Elastic endpoint and API key
+- Check if Agent Builder is enabled on your Elastic instance
+- Ensure proper permissions for Agent Builder access
 
 ### Cursor Can't Connect
 - Verify MCP configuration in Cursor settings
-- Check server is running and accessible
+- Check Agent Builder is accessible
 - Restart Cursor after configuration changes
 - Check Cursor logs for MCP connection errors
 
@@ -192,7 +145,7 @@ You can now ask Cursor questions like:
 - Verify Elastic endpoint and API key
 - Check if applications are sending OTEL data
 - Ensure time range includes recent data
-- Test Elastic connection independently
+- Test Agent Builder connection independently
 
 ## 📚 Advanced Configuration
 
@@ -200,15 +153,18 @@ You can now ask Cursor questions like:
 ```json
 {
   "mcpServers": {
-    "elastic-otel": {
-      "command": "python",
+    "elastic-agent-builder": {
+      "command": "curl",
       "args": [
-        "/opt/o11y-mcp-server/elastic-otel-mcp-server.py",
-        "https://your-elastic-endpoint",
-        "your-api-key"
+        "-X", "POST",
+        "-H", "Authorization: ApiKey ${ELASTIC_API_KEY}",
+        "-H", "kbn-xsrf: true",
+        "-H", "Content-Type: application/json",
+        "${ELASTIC_ENDPOINT}/api/agent_builder/tools"
       ],
       "env": {
-        "PYTHONPATH": "/opt/o11y-mcp-server/venv/lib/python3.13/site-packages",
+        "ELASTIC_ENDPOINT": "${ELASTIC_ENDPOINT}",
+        "ELASTIC_API_KEY": "${ELASTIC_API_KEY}",
         "ELASTIC_TIMEOUT": "30",
         "LOG_LEVEL": "INFO"
       }
@@ -217,17 +173,17 @@ You can now ask Cursor questions like:
 }
 ```
 
-### Multiple MCP Servers
+### Multiple Agent Builder Connections
 ```json
 {
   "mcpServers": {
-    "elastic-otel": {
-      "command": "python",
-      "args": ["/opt/o11y-mcp-server/elastic-otel-mcp-server.py", "endpoint1", "key1"]
+    "elastic-agent-builder-prod": {
+      "command": "curl",
+      "args": ["-X", "POST", "-H", "Authorization: ApiKey ${PROD_API_KEY}", "${PROD_ENDPOINT}/api/agent_builder/tools"]
     },
-    "elastic-otel-staging": {
-      "command": "python", 
-      "args": ["/opt/o11y-mcp-server/elastic-otel-mcp-server.py", "endpoint2", "key2"]
+    "elastic-agent-builder-staging": {
+      "command": "curl",
+      "args": ["-X", "POST", "-H", "Authorization: ApiKey ${STAGING_API_KEY}", "${STAGING_ENDPOINT}/api/agent_builder/tools"]
     }
   }
 }
@@ -235,10 +191,10 @@ You can now ask Cursor questions like:
 
 ## 🎉 Success!
 
-You now have a complete MCP workflow:
+You now have a complete Agent Builder workflow:
 - **Cursor IDE** for development
-- **MCP Server** for Elastic data access
+- **Elastic Agent Builder** for AI-powered data analysis
 - **Elastic Serverless** for OTEL data storage
 - **Real-time insights** for application health monitoring
 
-This setup allows you to develop, monitor, and optimize your applications all within Cursor using the power of MCP!
+This setup allows you to develop, monitor, and optimize your applications all within Cursor using the power of Elastic Agent Builder!

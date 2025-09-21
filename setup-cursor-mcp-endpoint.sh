@@ -1,7 +1,24 @@
 #!/bin/bash
 
-echo "🔗 Setting up Elastic MCP Server as Cursor Endpoint"
-echo "==================================================="
+echo "🤖 Setting up Elastic Agent Builder as Cursor Endpoint"
+echo "======================================================"
+
+# Load environment variables
+if [ -f .env ]; then
+    echo "📄 Loading environment variables from .env file..."
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
+# Get credentials from environment variables
+if [ -z "$ELASTIC_ENDPOINT" ] || [ -z "$ELASTIC_API_KEY" ]; then
+    echo "❌ Error: Required environment variables not set!"
+    echo "Please set ELASTIC_ENDPOINT and ELASTIC_API_KEY in your .env file"
+    echo "Or run: ./setup-env.sh"
+    exit 1
+fi
+
+echo "📊 Elastic Endpoint: $ELASTIC_ENDPOINT"
+echo "🔑 API Key: ${ELASTIC_API_KEY:0:20}..."
 
 # Detect OS and set config path
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -27,31 +44,19 @@ echo "📄 Config file: $CONFIG_FILE"
 # Create config directory
 mkdir -p "$CONFIG_DIR"
 
-# Load environment variables
-if [ -f .env ]; then
-    echo "📄 Loading environment variables from .env file..."
-    export $(cat .env | grep -v '^#' | xargs)
-fi
-
-# Get credentials from environment variables
-if [ -z "$ELASTIC_ENDPOINT" ] || [ -z "$ELASTIC_API_KEY" ]; then
-    echo "❌ Error: Required environment variables not set!"
-    echo "Please set ELASTIC_ENDPOINT and ELASTIC_API_KEY in your .env file"
-    echo "Or run: ./setup-env.sh"
-    exit 1
-fi
-
-echo "📊 Elastic Endpoint: $ELASTIC_ENDPOINT"
-echo "🔑 API Key: ${ELASTIC_API_KEY:0:20}..."
-
-# Create MCP configuration
+# Create Agent Builder MCP configuration
 cat > "$CONFIG_FILE" << EOF
 {
   "mcpServers": {
-    "elastic-otel": {
-      "command": "/opt/o11y-mcp-server/venv/bin/python",
+    "elastic-agent-builder": {
+      "command": "curl",
       "args": [
-        "/opt/o11y-mcp-server/elastic-otel-mcp-server.py"
+        "-X", "POST",
+        "-H", "Authorization: ApiKey $ELASTIC_API_KEY",
+        "-H", "kbn-xsrf: true",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"tool_name\": \"platform.core.search\", \"parameters\": {\"query\": \"application health\", \"index\": \"metrics-*\"}}",
+        "$ELASTIC_ENDPOINT/api/agent_builder/tools"
       ],
       "env": {
         "ELASTIC_ENDPOINT": "$ELASTIC_ENDPOINT",
@@ -62,30 +67,28 @@ cat > "$CONFIG_FILE" << EOF
 }
 EOF
 
-echo "✅ Cursor MCP configuration created!"
+echo "✅ Cursor MCP configuration with Agent Builder created!"
 echo ""
 echo "🔧 Configuration Details:"
-echo "  • Server Name: elastic-otel"
-echo "  • Command: Python MCP server"
+echo "  • Server Name: elastic-agent-builder"
+echo "  • Command: curl (direct API calls to Agent Builder)"
 echo "  • Environment: ELASTIC_ENDPOINT and ELASTIC_API_KEY set"
-echo "  • Tools: 7 OTEL health analysis tools"
+echo "  • Tools: Agent Builder platform tools"
 echo ""
 echo "🚀 Next Steps:"
 echo "1. Restart Cursor IDE"
-echo "2. Start your MCP server: ./run-mcp-server.sh"
+echo "2. Test Agent Builder connection: ./connect-to-agent-builder.sh"
 echo "3. In Cursor, ask questions like:"
 echo "   - 'What's the health of my applications?'"
 echo "   - 'Show me metrics for the payment service'"
 echo "   - 'What errors are happening in the last hour?'"
-echo "   - 'Find the slowest operations in my system'"
+echo "   - 'Generate an ESQL query for performance analysis'"
 echo ""
-echo "📚 Available MCP Tools in Cursor:"
-echo "  • get_application_health - Overall health status"
-echo "  • get_service_metrics - Service-specific metrics"
-echo "  • get_error_analysis - Error and exception analysis"
-echo "  • get_performance_issues - Performance bottleneck identification"
-echo "  • get_resource_utilization - Resource usage monitoring"
-echo "  • get_trace_analysis - Distributed trace analysis"
-echo "  • get_code_recommendations - Optimization recommendations"
+echo "🎯 Available Agent Builder Tools in Cursor:"
+echo "  • platform.core.search - Search OTEL data in Elasticsearch"
+echo "  • platform.core.execute_esql - Execute ESQL queries on OTEL data"
+echo "  • platform.core.generate_esql - Generate ESQL queries for analysis"
+echo "  • Built-in Analysis - Error patterns, performance metrics, resource utilization"
+echo "  • Real-time Monitoring - Application health, service dependencies, bottlenecks"
 echo ""
-echo "✅ Setup complete! Your Elastic MCP server is now configured as a Cursor endpoint."
+echo "✅ Setup complete! Your Elastic Agent Builder is now configured as a Cursor endpoint."

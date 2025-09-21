@@ -1,30 +1,29 @@
-# 🚀 Elastic OTEL MCP Server
+# 🤖 Elastic Agent Builder Integration
 
-A Model Context Protocol (MCP) server that provides real-time insights into application health from Elastic Serverless Observability OTEL data.
+Connect to Elastic Agent Builder for AI-powered application health monitoring using OTEL data from Elastic Serverless Observability.
 
 ## ✨ Features
 
-- **7 Powerful Tools** for analyzing application health
+- **AI-Powered Analysis** through Elastic Agent Builder
 - **Real-time Insights** from OTEL metrics, traces, and logs
+- **Built-in Tools** for comprehensive monitoring
 - **Easy Integration** with Cursor IDE and other MCP clients
-- **Comprehensive Monitoring** of services, errors, performance, and resources
+- **No Local Server Required** - direct connection to Elastic
 
-## 🎯 Available Tools
+## 🎯 Available Agent Builder Tools
 
-- **`get_application_health`** - Overall application health status
-- **`get_service_metrics`** - Service-specific metrics (CPU, memory, response time, error rate)
-- **`get_error_analysis`** - Error and exception analysis
-- **`get_performance_issues`** - Performance bottleneck identification
-- **`get_resource_utilization`** - Resource usage monitoring
-- **`get_trace_analysis`** - Distributed trace analysis
-- **`get_code_recommendations`** - Optimization recommendations
+- **`platform.core.search`** - Search OTEL data in Elasticsearch
+- **`platform.core.execute_esql`** - Execute ESQL queries on OTEL data
+- **`platform.core.generate_esql`** - Generate ESQL queries for analysis
+- **Built-in Analysis** - Error patterns, performance metrics, resource utilization
+- **Real-time Monitoring** - Application health, service dependencies, bottlenecks
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
-- Elastic Serverless Observability endpoint
+- Elastic Serverless Observability endpoint with Agent Builder enabled
 - Valid API key for Elastic
+- Cursor IDE (optional, for MCP integration)
 
 ### Installation
 
@@ -34,14 +33,7 @@ A Model Context Protocol (MCP) server that provides real-time insights into appl
    cd o11y-mcp-server
    ```
 
-2. **Set up virtual environment**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-
-3. **Configure credentials**
+2. **Configure credentials**
    ```bash
    # Option 1: Use setup script (recommended)
    ./setup-env.sh
@@ -50,63 +42,56 @@ A Model Context Protocol (MCP) server that provides real-time insights into appl
    # Option 2: Set environment variables
    export ELASTIC_ENDPOINT=https://your-endpoint.kb.us-east-1.aws.elastic.cloud
    export ELASTIC_API_KEY=your-api-key
-   
-   # Option 3: Use demo credentials
-   ./run-mcp-server.sh demo
    ```
 
-4. **Run the server**
+3. **Connect to Agent Builder**
    ```bash
-   # With environment variables or .env file
-   ./run-mcp-server.sh
+   # Test Agent Builder connection
+   ./connect-to-agent-builder.sh
    
-   # With command line arguments
-   ./run-mcp-server.sh <your-elastic-endpoint> <your-api-key>
+   # Query application health
+   ./query-application-health.sh
+   ```
+
+4. **Set up Cursor integration (optional)**
+   ```bash
+   # Create Cursor MCP configuration
+   ./setup-cursor-agent-builder.sh
    ```
 
 ## 🔗 Cursor Integration
 
 ### Quick Setup
 ```bash
-./setup-cursor-mcp.sh
+./setup-cursor-agent-builder.sh
 ```
 
 ### Manual Setup
-1. Copy `cursor-mcp-config.json` to your Cursor config directory
+1. Run the Cursor configuration script
 2. Restart Cursor IDE
-3. Start your MCP server
+3. Connect to Elastic Agent Builder
 4. Ask questions like "What's the health of my applications?"
 
 ## 📊 Data Sources
 
-The server connects to Elastic Serverless Observability and queries:
+Agent Builder connects to Elastic Serverless Observability and analyzes:
 - **Metrics**: `metrics-*` indices (CPU, memory, custom metrics)
 - **Logs**: `logs-*` indices (application logs, errors, events)
 - **Traces**: `traces-*` indices (distributed tracing data)
 
 ## 🛠️ Configuration
 
-### MCP Configuration
-```json
-{
-  "mcpServers": {
-    "elastic-otel": {
-      "command": "python",
-      "args": ["/path/to/elastic-otel-mcp-server.py", "https://your-endpoint", "your-api-key"],
-      "env": {}
-    }
-  }
-}
-```
-
 ### Environment Variables
 - `ELASTIC_ENDPOINT` - Your Elastic Serverless endpoint
 - `ELASTIC_API_KEY` - Your Elastic API key
 - `LOG_LEVEL` - Logging level (default: INFO)
 
+### Cursor MCP Configuration
+The setup script creates `~/.cursor/mcp_config.json` with Agent Builder integration.
+
 ## 📝 Example Queries
 
-Once connected to an MCP client, you can ask:
+Once connected to Agent Builder, you can ask:
 
 - "What's the overall health of my applications?"
 - "Show me metrics for the payment service"
@@ -114,14 +99,14 @@ Once connected to an MCP client, you can ask:
 - "Find the slowest operations in my system"
 - "Analyze resource utilization across all services"
 - "Show me trace analysis for the checkout flow"
-- "What code optimizations do you recommend?"
+- "Generate an ESQL query for error analysis"
 
 ## 🔧 Troubleshooting
 
-### Server Won't Start
-- Ensure virtual environment is activated: `source venv/bin/activate`
-- Check dependencies: `pip list | grep -E "(httpx|mcp)"`
+### Agent Builder Connection Issues
 - Verify Elastic endpoint and API key
+- Check if Agent Builder is enabled on your Elastic instance
+- Test connection: `./connect-to-agent-builder.sh`
 
 ### No Data Found
 - Check if applications are sending OTEL data
@@ -130,14 +115,14 @@ Once connected to an MCP client, you can ask:
 
 ### Cursor Integration Issues
 - Verify MCP configuration in Cursor settings
-- Check server is running and accessible
+- Check Agent Builder is accessible
 - Restart Cursor after configuration changes
 
 ## 📚 Documentation
 
-- **`USAGE-GUIDE.md`** - Complete usage guide
 - **`CURSOR-MCP-INTEGRATION.md`** - Cursor integration guide
-- **`MCP-SERVER-GUIDE.md`** - Detailed MCP server documentation
+- **`connect-to-agent-builder.sh`** - Agent Builder connection script
+- **`query-application-health.sh`** - Application health analysis script
 
 ## 🤝 Contributing
 
@@ -153,10 +138,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgments
 
-- Built with [MCP (Model Context Protocol)](https://modelcontextprotocol.io/)
+- Built with [Elastic Agent Builder](https://www.elastic.co/guide/en/elasticsearch/reference/current/agent-builder.html)
 - Integrates with [Elastic Serverless Observability](https://www.elastic.co/cloud/serverless)
 - Compatible with [Cursor IDE](https://cursor.sh/)
 
 ---
 
-**Ready to monitor your application health with AI-powered insights!** 🎉
+**Ready to monitor your application health with AI-powered insights through Elastic Agent Builder!** 🎉

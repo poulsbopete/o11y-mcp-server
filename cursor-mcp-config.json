@@ -1,9 +1,14 @@
 {
   "mcpServers": {
-    "elastic-otel": {
-      "command": "/opt/o11y-mcp-server/venv/bin/python",
+    "elastic-agent-builder": {
+      "command": "curl",
       "args": [
-        "/opt/o11y-mcp-server/elastic-otel-mcp-server.py"
+        "-X", "POST",
+        "-H", "Authorization: ApiKey ${ELASTIC_API_KEY}",
+        "-H", "kbn-xsrf: true",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"tool_name\": \"platform.core.search\", \"parameters\": {\"query\": \"application health\", \"index\": \"metrics-*\"}}",
+        "${ELASTIC_ENDPOINT}/api/agent_builder/tools"
       ],
       "env": {
         "ELASTIC_ENDPOINT": "${ELASTIC_ENDPOINT}",

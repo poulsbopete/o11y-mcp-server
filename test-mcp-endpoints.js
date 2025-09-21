@@ -6,7 +6,7 @@ function getKibanaUrl(elasticsearchUrl) {
     if (elasticsearchUrl && elasticsearchUrl.includes('.es.')) {
         return elasticsearchUrl.replace('.es.', '.kb.');
     }
-    return elasticsearchUrl || 'https://ai-assistants-ffcafb.kb.us-east-1.aws.elastic.cloud';
+    return elasticsearchUrl || process.env.ELASTIC_ENDPOINT || 'https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud';
 }
 
 const ELASTIC_CONFIG = {

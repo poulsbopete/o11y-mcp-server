@@ -1,9 +1,19 @@
 {
   "mcpServers": {
-    "elastic-otel": {
-      "command": "python",
-      "args": ["/opt/o11y-mcp-server/elastic-otel-mcp-server.py", "https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud", "ZktNNGJaa0JxTVdyT0R5UlpCR2w6bzNtZTV5eVRicVJlV21hRmN0TVBvZw=="],
-      "env": {}
+    "elastic-agent-builder": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "-H", "Authorization: ApiKey ${ELASTIC_API_KEY}",
+        "-H", "kbn-xsrf: true",
+        "-H", "Content-Type: application/json",
+        "-d", "{\"tool_name\": \"platform.core.search\", \"parameters\": {\"query\": \"application health\", \"index\": \"metrics-*\"}}",
+        "${ELASTIC_ENDPOINT}/api/agent_builder/tools"
+      ],
+      "env": {
+        "ELASTIC_ENDPOINT": "${ELASTIC_ENDPOINT}",
+        "ELASTIC_API_KEY": "${ELASTIC_API_KEY}"
+      }
     }
   }
 }
